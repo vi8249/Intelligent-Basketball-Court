@@ -25,16 +25,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by vi8249 on 2017/5/27.
- * mcs : https://mcs.mediatek.com/public/devices/DRbB5aVM
  */
 
 public class CourtActivity2 extends Fragment {
-    private static String[] url = {"https://api.mediatek.com/mcs/v2/devices/DRbB5aVM/datachannels/Temp_Display/datapoints",
-                                    "https://api.mediatek.com/mcs/v2/devices/DRbB5aVM/datachannels/Toggle_Button/datapoints"};
+    private static String[] url = {"https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints",
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints",
+            "https://api.mediatek.com/mcs/v2/devices/DRbB5aVM/datachannels/Toggle_Button/datapoints"};
     HttpURLConnection connection = null;
     String responseString = "";
     private ProgressDialog pDialog;
-    private TextView testView;
+    private TextView temperature, humidity;
     private ImageView leftCourt, rightCourt;
     private Button mBtn;
     private View rootView;
@@ -44,15 +44,15 @@ public class CourtActivity2 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.court_view, container, false);
-        testView = (TextView) rootView.findViewById(R.id.temperature);
+        temperature = (TextView) rootView.findViewById(R.id.temperature);
+        humidity = (TextView) rootView.findViewById(R.id.humidity);
         leftCourt = (ImageView) rootView.findViewById(R.id.leftCourt);
         rightCourt = (ImageView) rootView.findViewById(R.id.rightCourt);
 
         mBtn = (Button) rootView.findViewById(R.id.button);
         mBtn.setOnClickListener(mBtnOnClick);
 
-        new LoadingMCSAsyncTask().execute(url[0]);
-        new LoadingMCSAsyncTask().execute(url[1]);
+        for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
 
         return rootView;
     }
@@ -70,9 +70,9 @@ public class CourtActivity2 extends Fragment {
         private boolean invalidUrl = false;
 
         @Override
-        protected Integer doInBackground(String... urlString) {
+        protected Integer doInBackground(String... param) {
             try {
-                URL url = new URL(urlString[0]);
+                URL url = new URL(param[0]);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(2000);
@@ -154,7 +154,11 @@ public class CourtActivity2 extends Fragment {
             switch (tJsonObject.getDataChannels().get(0).getDataChnID()) {
                 case "Temp_Display":
                     String temperature = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
-                    testView.setText(temperature);
+                    CourtActivity2.this.temperature.setText(temperature);
+                    break;
+                case "Hum_Display":
+                    String humidity = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
+                    CourtActivity2.this.humidity.setText(humidity);
                     break;
                 case "Toggle_Button":
                     if ((int) tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue() == 0)

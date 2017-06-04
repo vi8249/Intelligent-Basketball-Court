@@ -1,12 +1,16 @@
 package com.example.vi8249.intelligentbasketballcourt;
 
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +19,10 @@ public class MainActivity extends AppCompatActivity {
 
     private android.support.design.widget.TabLayout mTabs;
     private ViewPager mViewPager;
+
+    private CourtActivity courtActivity1 = null;
+    private CourtActivity2 courtActivity2 = null;
+    private DataChartActivity dataChartActivity = null;
 
     public static int lastPosition = 0;
 
@@ -34,18 +42,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageScrollStateChanged(int state) {}
         });
-
+        mViewPager.setOffscreenPageLimit(5);
         setupViewPager(mViewPager);
 
         mTabs = (TabLayout) findViewById(R.id.tabs);
         mTabs.setupWithViewPager(mViewPager);
     }
 
+    // Add TabView
     private void setupViewPager(ViewPager viewPager) {
         CourtPagerAdapter adapter = new CourtPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new CourtActivity(), "Court 1");
-        adapter.addFragment(new CourtActivity2(), "Court 2");
-
+        if(courtActivity1 == null) {
+            courtActivity1 = new CourtActivity();
+            adapter.addFragment(courtActivity1, "Court 1");
+        }
+        if(courtActivity2 == null) {
+            courtActivity2 = new CourtActivity2();
+            adapter.addFragment(courtActivity2, "Court 2");
+        }
+        if(dataChartActivity == null) {
+            dataChartActivity = new DataChartActivity();
+            adapter.addFragment(dataChartActivity, "Data Chart");
+        }
         viewPager.setAdapter(adapter);
     }
 
