@@ -18,7 +18,9 @@ public class JsonObject {
     @SerializedName("dataChannels")
     private List<DataChannels> dataChannels;
 
-    public List<DataChannels> getDataChannels() { return dataChannels; }
+    public List<DataChannels> getDataChannels() {
+        return dataChannels;
+    }
 
     class DataChannels {
         @SerializedName("dataChnId")
@@ -27,21 +29,29 @@ public class JsonObject {
         @SerializedName("dataPoints")
         private List<DataPoints> dataPoints;
 
-        public String getDataChnID() { return dataChnID; }
+        public String getDataChnID() {
+            return dataChnID;
+        }
 
-        public List<DataPoints> getDataPoints() { return dataPoints; }
+        public List<DataPoints> getDataPoints() {
+            return dataPoints;
+        }
 
         class DataPoints {
             @SerializedName("values")
             private Values values;
 
-            public Values getValues() { return values; }
+            public Values getValues() {
+                return values;
+            }
 
             class Values {
                 @SerializedName("value")
                 private float value;
 
-                public float getValue() { return value; }
+                public float getValue() {
+                    return value;
+                }
             }
         }
     }

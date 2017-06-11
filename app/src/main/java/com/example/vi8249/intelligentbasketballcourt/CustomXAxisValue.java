@@ -18,6 +18,6 @@ public class CustomXAxisValue implements IAxisValueFormatter {
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        return list.get((int)value);
+        return list.get((int) value);
     }
 }

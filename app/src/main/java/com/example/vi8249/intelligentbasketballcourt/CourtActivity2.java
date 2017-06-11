@@ -1,16 +1,13 @@
 package com.example.vi8249.intelligentbasketballcourt;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,22 +26,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public class CourtActivity2 extends Fragment {
+    private static final AtomicInteger PROGRESS_NUM = new AtomicInteger(0);
     private static String[] url = {
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Temp_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Hum_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib_Display/datapoints",
     };
-
     HttpURLConnection connection = null;
     String responseString = "";
-
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressDialog pDialog;
     private TextView temperature, humidity;
     private ImageView leftCourt, rightCourt;
     private View rootView;
-
-    private static final AtomicInteger PROGRESS_NUM = new AtomicInteger(0);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -114,7 +108,7 @@ public class CourtActivity2 extends Fragment {
             super.onPreExecute();
 
             int x = PROGRESS_NUM.getAndIncrement();
-            if(x == 0) {
+            if (x == 0) {
                 pDialog = new ProgressDialog(getActivity());
                 pDialog = ProgressDialog.show(getActivity(), "Message", "Loading...", true);
                 pDialog.setCancelable(false);
@@ -127,7 +121,7 @@ public class CourtActivity2 extends Fragment {
             super.onPostExecute(result);
 
             int x = PROGRESS_NUM.decrementAndGet();
-            if(x == 0 && pDialog.isShowing())
+            if (x == 0 && pDialog.isShowing())
                 pDialog.dismiss();
 
             if (invalidUrl) {

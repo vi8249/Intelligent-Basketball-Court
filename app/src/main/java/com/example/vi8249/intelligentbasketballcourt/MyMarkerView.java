@@ -7,21 +7,13 @@ package com.example.vi8249.intelligentbasketballcourt;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.Chart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.IMarker;
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.utils.FSize;
 import com.github.mikephil.charting.utils.MPPointF;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -33,6 +25,8 @@ import java.util.ArrayList;
 public class MyMarkerView extends MarkerView {
     private TextView tvContent, tvDate;
     private ArrayList<String> XAxisLabel;
+    private MPPointF mOffset;
+
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.
      *
@@ -50,9 +44,9 @@ public class MyMarkerView extends MarkerView {
     public void refreshContent(Entry e, Highlight highlight) {
         //Log.d("marker", "" + e.getX() + " " + e.getY());
 
-        tvDate.setText("" + XAxisLabel.get((int)e.getX()));
+        tvDate.setText("" + XAxisLabel.get((int) e.getX()));
 
-        if(highlight.getDataSetIndex() == 1)
+        if (highlight.getDataSetIndex() == 1)
             tvContent.setText("" + e.getY() + " %");
         else
             tvContent.setText("" + e.getY() + " °C");
@@ -60,13 +54,11 @@ public class MyMarkerView extends MarkerView {
         super.refreshContent(e, highlight);
     }
 
-    private MPPointF mOffset;
-
     @Override
     public MPPointF getOffset() {
-        if(mOffset == null) {
+        if (mOffset == null) {
             // center the marker horizontally and vertically
-            mOffset = new MPPointF(-getWidth()/2+225, -getHeight()-30);
+            mOffset = new MPPointF(-getWidth() / 2 + 225, -getHeight() - 30);
         }
 
         return mOffset;
@@ -78,7 +70,7 @@ public class MyMarkerView extends MarkerView {
         Log.d("offset", Float.toString(getOffset().getX()));
         Log.d("offset", "draw: " + getWidth());
 
-        if(posX-offset.x > getWidth())
+        if (posX - offset.x > getWidth())
             posX -= 450f;
 
         int saveId = canvas.save();
