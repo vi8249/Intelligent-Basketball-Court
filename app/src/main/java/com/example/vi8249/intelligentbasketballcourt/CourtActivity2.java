@@ -28,9 +28,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public class CourtActivity2 extends Fragment {
-    private static String[] url = {"https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints",
+    private static String[] url = {
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints",
-            "https://api.mediatek.com/mcs/v2/devices/DRbB5aVM/datachannels/Toggle_Button/datapoints"};
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib_Display/datapoints",
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib2_Display/datapoints"
+    };
     HttpURLConnection connection = null;
     String responseString = "";
     private ProgressDialog pDialog;
@@ -52,7 +55,7 @@ public class CourtActivity2 extends Fragment {
         mBtn = (Button) rootView.findViewById(R.id.button);
         mBtn.setOnClickListener(mBtnOnClick);
 
-        for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
+        //for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
 
         return rootView;
     }
@@ -62,6 +65,7 @@ public class CourtActivity2 extends Fragment {
         @Override
         public void onClick(View v) {
             // refresh
+            for (String anUrl : url) new CourtActivity2.LoadingMCSAsyncTask().execute(anUrl);
         }
     };
 
@@ -87,7 +91,7 @@ public class CourtActivity2 extends Fragment {
 
                     while ((tempStr = bufferedReader.readLine()) != null) {
                         stringBuffer.append(tempStr);
-                        Log.d("json", tempStr);
+                        //Log.d("json", tempStr);
                     }
 
                     bufferedReader.close();
@@ -129,7 +133,9 @@ public class CourtActivity2 extends Fragment {
                 pDialog.dismiss();
 
             if (invalidUrl) {
-                new android.app.AlertDialog.Builder(getActivity())
+                temperature.setText("N/A");
+                humidity.setText("N/A");
+                /*new android.app.AlertDialog.Builder(getActivity())
                         .setTitle("Error")
                         .setMessage("Connection failed")
                         .setNeutralButton("OK", new DialogInterface.OnClickListener() {
@@ -137,7 +143,7 @@ public class CourtActivity2 extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         })
-                        .show();
+                        .show();*/
             } else {
                 Gson gson = new Gson();
                 JsonObject tJsonObject = gson.fromJson(responseString, JsonObject.class);
@@ -160,12 +166,19 @@ public class CourtActivity2 extends Fragment {
                     String humidity = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
                     CourtActivity2.this.humidity.setText(humidity);
                     break;
-                case "Toggle_Button":
+                case "Vib_Display":
                     if ((int) tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue() == 0)
                         leftCourt.setImageResource(R.drawable.left_court);
                     else
                         leftCourt.setImageResource(R.drawable.left_court_dark);
-                    Log.d("json", Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue()));
+                    //Log.d("json", Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue()));
+                    break;
+                case "Vib2_Display":
+                    if ((int) tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue() == 0)
+                        rightCourt.setImageResource(R.drawable.right_court);
+                    else
+                        rightCourt.setImageResource(R.drawable.right_court_dark);
+                    //Log.d("json", Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue()));
                     break;
             }
         }

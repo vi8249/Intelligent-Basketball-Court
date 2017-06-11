@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private android.support.design.widget.TabLayout mTabs;
-    private ViewPager mViewPager;
+    private CustomViewPager mViewPager;
 
     private CourtActivity courtActivity1 = null;
     private CourtActivity2 courtActivity2 = null;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mViewPager = (CustomViewPager) findViewById(R.id.viewpager);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {}
         });
         mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setPagingEnabled(false);
         setupViewPager(mViewPager);
 
         mTabs = (TabLayout) findViewById(R.id.tabs);
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Add TabView
-    private void setupViewPager(ViewPager viewPager) {
+    private void setupViewPager(CustomViewPager viewPager) {
         CourtPagerAdapter adapter = new CourtPagerAdapter(getSupportFragmentManager());
         if(courtActivity1 == null) {
             courtActivity1 = new CourtActivity();

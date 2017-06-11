@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.IMarker;
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
@@ -47,9 +48,14 @@ public class MyMarkerView extends MarkerView {
 
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
-        Log.d("marker", "" + e.getX() + " " + e.getY());
+        //Log.d("marker", "" + e.getX() + " " + e.getY());
+
         tvDate.setText("" + XAxisLabel.get((int)e.getX()));
-        tvContent.setText("" + e.getY() + " °C");
+
+        if(highlight.getDataSetIndex() == 1)
+            tvContent.setText("" + e.getY() + " %");
+        else
+            tvContent.setText("" + e.getY() + " °C");
 
         super.refreshContent(e, highlight);
     }
@@ -60,9 +66,25 @@ public class MyMarkerView extends MarkerView {
     public MPPointF getOffset() {
         if(mOffset == null) {
             // center the marker horizontally and vertically
-            mOffset = new MPPointF(-(getWidth() / 2), -getHeight());
+            mOffset = new MPPointF(-getWidth()/2+225, -getHeight()-30);
         }
 
         return mOffset;
+    }
+
+    @Override
+    public void draw(Canvas canvas, float posX, float posY) {
+        MPPointF offset = getOffset();
+        Log.d("offset", Float.toString(getOffset().getX()));
+        Log.d("offset", "draw: " + getWidth());
+
+        if(posX-offset.x > getWidth())
+            posX -= 450f;
+
+        int saveId = canvas.save();
+        // translate to the correct position and draw
+        canvas.translate(posX + offset.x, posY + offset.y);
+        draw(canvas);
+        canvas.restoreToCount(saveId);
     }
 }
