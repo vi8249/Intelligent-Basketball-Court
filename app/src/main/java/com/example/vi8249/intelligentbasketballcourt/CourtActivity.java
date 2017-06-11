@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,14 +33,15 @@ public class CourtActivity extends Fragment {
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib_Display/datapoints",
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib2_Display/datapoints"
     };
+
     HttpURLConnection connection = null;
     String responseString = "";
+
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressDialog pDialog;
     private TextView temperature, humidity;
     private ImageView leftCourt, rightCourt;
-    private Button mBtn;
     private View rootView;
 
     private static final AtomicInteger PROGRESS_NUM = new AtomicInteger(0);
@@ -47,27 +49,26 @@ public class CourtActivity extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.court_view, container, false);
+
         temperature = (TextView) rootView.findViewById(R.id.temperature);
         humidity = (TextView) rootView.findViewById(R.id.humidity);
         leftCourt = (ImageView) rootView.findViewById(R.id.leftCourt);
         rightCourt = (ImageView) rootView.findViewById(R.id.rightCourt);
 
-        mBtn = (Button) rootView.findViewById(R.id.button);
-        mBtn.setOnClickListener(mBtnOnClick);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (mSwipeRefreshLayout.isRefreshing())
+                    mSwipeRefreshLayout.setRefreshing(false);
+                for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
+            }
+        });
 
         for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
 
         return rootView;
     }
-
-    private View.OnClickListener mBtnOnClick = new View.OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            // refresh
-            for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
-        }
-    };
 
     private class LoadingMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
         private boolean invalidUrl = false;
