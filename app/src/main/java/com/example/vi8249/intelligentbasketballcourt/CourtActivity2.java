@@ -55,7 +55,7 @@ public class CourtActivity2 extends Fragment {
         mBtn = (Button) rootView.findViewById(R.id.button);
         mBtn.setOnClickListener(mBtnOnClick);
 
-        //for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
+        for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
 
         return rootView;
     }
