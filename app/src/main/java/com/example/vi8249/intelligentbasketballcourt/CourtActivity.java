@@ -31,15 +31,19 @@ public class CourtActivity extends Fragment {
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib_Display/datapoints",
-            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints"
+            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints",
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Bat_Display/datapoints"
     };
     HttpURLConnection connection = null;
     String responseString = "";
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressDialog pDialog;
-    private TextView temperature, humidity;
+    private TextView temperature, humidity, battery;
     private ImageView leftCourt, rightCourt;
     private View rootView;
+
+    private String IntentTemperature, IntentHumidity, IntentBattery;
+    private boolean IntentLeftCourt, IntentRightCourt;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,6 +53,7 @@ public class CourtActivity extends Fragment {
         humidity = (TextView) rootView.findViewById(R.id.humidity);
         leftCourt = (ImageView) rootView.findViewById(R.id.leftCourt);
         rightCourt = (ImageView) rootView.findViewById(R.id.rightCourt);
+        battery = (TextView) rootView.findViewById(R.id.battery);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -60,9 +65,37 @@ public class CourtActivity extends Fragment {
             }
         });
 
-        for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
+        if (!IntentTemperature.equals("N/A"))
+            temperature.setText(IntentTemperature + " °C");
+        else
+            temperature.setText(IntentTemperature);
+        if (!IntentHumidity.equals("N/A"))
+            humidity.setText(IntentHumidity + " %");
+        else
+            humidity.setText(IntentHumidity);
+        if (!IntentBattery.equals("N/A"))
+            battery.setText(IntentBattery + " %");
+        else
+            battery.setText(IntentBattery);
+
+        if (IntentLeftCourt)
+            leftCourt.setImageResource(R.drawable.left_court);
+        else
+            leftCourt.setImageResource(R.drawable.left_court_dark);
+        if (IntentRightCourt)
+            rightCourt.setImageResource(R.drawable.right_court);
+        else
+            rightCourt.setImageResource(R.drawable.right_court_dark);
 
         return rootView;
+    }
+
+    public void Initialize(String intentTemperature, String intentHumidity, boolean leftCourt, boolean rightCourt, String intentBattery) {
+        IntentTemperature = intentTemperature;
+        IntentHumidity = intentHumidity;
+        IntentLeftCourt = leftCourt;
+        IntentRightCourt = rightCourt;
+        IntentBattery = intentBattery;
     }
 
     private class LoadingMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
@@ -128,8 +161,9 @@ public class CourtActivity extends Fragment {
                 pDialog.dismiss();
 
             if (invalidUrl) {
-                temperature.setText("N/A");
-                humidity.setText("N/A");
+                CourtActivity.this.temperature.setText("N/A");
+                CourtActivity.this.humidity.setText("N/A");
+                CourtActivity.this.battery.setText("N/A");
                 /*new android.app.AlertDialog.Builder(getActivity())
                         .setTitle("Error")
                         .setMessage("Connection failed")
@@ -174,6 +208,10 @@ public class CourtActivity extends Fragment {
                     else
                         rightCourt.setImageResource(R.drawable.right_court_dark);
                     //Log.d("json", Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue()));
+                    break;
+                case "Bat_Display":
+                    String battery = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
+                    CourtActivity.this.battery.setText(battery + " %");
                     break;
             }
         }

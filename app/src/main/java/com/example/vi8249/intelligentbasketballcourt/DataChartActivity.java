@@ -46,8 +46,8 @@ public class DataChartActivity extends Fragment {
     private static final AtomicInteger CONNECTION_NUM = new AtomicInteger(0);
     HttpURLConnection connection = null;
     private String[] url = {
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100"
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=1496246400000&end=" + System.currentTimeMillis() + "&limit=500",
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=1496246400000&end=" + System.currentTimeMillis() + "&limit=500"
     };
     private ProgressDialog pDialog;
     private TextView textView, textView2;
@@ -56,10 +56,11 @@ public class DataChartActivity extends Fragment {
     private String startTime, endTime;
     private Date date1, date2;
     private LineChart mChart;
-    private ArrayList<TemperatureData> tDataList = new ArrayList<>();
-    private ArrayList<HumidityData> hDataList = new ArrayList<>();
+    private ArrayList<TemperatureData> tDataList = null;
+    private ArrayList<HumidityData> hDataList = null;
     private ArrayList<ILineDataSet> dataSets = new ArrayList<>();
     private int mYear, mMonth, mDay;
+    private AsyncTask<String, Integer, Integer> asyncTask1, asyncTask2;
 
     private View.OnClickListener mBtnOnClick = new View.OnClickListener() {
 
@@ -69,7 +70,9 @@ public class DataChartActivity extends Fragment {
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
             mDay = c.get(Calendar.DAY_OF_MONTH);
+
             new DatePickerDialog(rootView.getContext(), new DatePickerDialog.OnDateSetListener() {
+
                 @Override
                 public void onDateSet(DatePicker view, int year, int month, int day) {
                     String format = setDateFormat(year, month, day);
@@ -97,10 +100,11 @@ public class DataChartActivity extends Fragment {
                                     .show();
                         } else {
                             setUrl();
-
                             mChart.clearValues();
-                            new DataChartActivity.LoadingTemperatureAsyncTask().execute(url[0]);
-                            new DataChartActivity.LoadingHumidityMCSAsyncTask().execute(url[1]);
+                            if (!dataSets.isEmpty())
+                                dataSets.clear();
+                            asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
+                            asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
                         }
                     }
                 }
@@ -145,10 +149,11 @@ public class DataChartActivity extends Fragment {
                                     .show();
                         } else {
                             setUrl();
-
                             mChart.clearValues();
-                            new DataChartActivity.LoadingTemperatureAsyncTask().execute(url[0]);
-                            new DataChartActivity.LoadingHumidityMCSAsyncTask().execute(url[1]);
+                            if(!dataSets.isEmpty())
+                                dataSets.clear();
+                            asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
+                            asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
                         }
                     }
                 }
@@ -169,10 +174,19 @@ public class DataChartActivity extends Fragment {
 
         InitialLineChart();
 
-        new DataChartActivity.LoadingTemperatureAsyncTask().execute(url[0]);
-        new DataChartActivity.LoadingHumidityMCSAsyncTask().execute(url[1]);
+        if (tDataList != null && hDataList != null)
+            addLineDataSet();
+        else {
+            tDataList = new ArrayList<>();
+            hDataList = new ArrayList<>();
+        }
 
         return rootView;
+    }
+
+    public void Initialize(ArrayList<TemperatureData> tList, ArrayList<HumidityData> hList) {
+        tDataList = tList;
+        hDataList = hList;
     }
 
     private void InitialLineChart() {
@@ -187,8 +201,8 @@ public class DataChartActivity extends Fragment {
 
     private void setUrl() {
         String tUrls[] = {
-                "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=:startTime&end=:endTime&limit=100",
-                "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=:startTime&end=:endTime&limit=100",
+                "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=:startTime&end=:endTime&limit=500",
+                "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=:startTime&end=:endTime&limit=500",
         };
         for (int i = 0; i < tUrls.length; i++) {
             String s = tUrls[i].replace(":startTime", startTime);
@@ -300,7 +314,6 @@ public class DataChartActivity extends Fragment {
 
                     String tempStr;
                     while ((tempStr = bufferedReader.readLine()) != null) {
-                        //Log.d("csv", tempStr);
                         String[] splitStr = tempStr.split(",");
 
                         if (splitStr[0].equals("Temp_Display")) {
@@ -308,7 +321,6 @@ public class DataChartActivity extends Fragment {
                             temperatureData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
                             temperatureData.data = Float.valueOf(splitStr[2]);
                             tDataList.add(temperatureData);
-                            //Log.d("csv", temperatureData.timestamp + " " + temperatureData.data);
                         }
                     }
                     bufferedReader.close();
@@ -328,7 +340,7 @@ public class DataChartActivity extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+            tDataList.clear();
             int x = PROGRESS_NUM.getAndIncrement();
             if (x == 0) {
                 pDialog = new ProgressDialog(getActivity());
@@ -348,18 +360,19 @@ public class DataChartActivity extends Fragment {
                 pDialog.dismiss();
 
             if (invalidUrl) {
-                if (CONNECTION_NUM.getAndIncrement() == 0) {
-                    new android.app.AlertDialog.Builder(getActivity())
-                            .setTitle("Error")
-                            .setMessage("Connection failed")
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    CONNECTION_NUM.decrementAndGet();
-                                }
-                            })
-                            .show();
-                }
+                new android.app.AlertDialog.Builder(getActivity())
+                        .setTitle("Error")
+                        .setMessage("No data point exist!")
+                        .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                CONNECTION_NUM.decrementAndGet();
+                            }
+                        })
+                        .show();
+            } else {
+                if (asyncTask2.getStatus() == Status.FINISHED)
+                    addLineDataSet();
             }
         }
 
@@ -387,7 +400,6 @@ public class DataChartActivity extends Fragment {
 
                     String tempStr;
                     while ((tempStr = bufferedReader.readLine()) != null) {
-                        //Log.d("csv", tempStr);
                         String[] splitStr = tempStr.split(",");
 
                         if (splitStr[0].equals("Hum_Display")) {
@@ -395,7 +407,6 @@ public class DataChartActivity extends Fragment {
                             humidityData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
                             humidityData.data = Float.valueOf(splitStr[2]);
                             hDataList.add(humidityData);
-                            //Log.d("csv", humidityData.timestamp + " " + humidityData.data);
                         }
                     }
                     bufferedReader.close();
@@ -415,7 +426,7 @@ public class DataChartActivity extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+            hDataList.clear();
             int x = PROGRESS_NUM.getAndIncrement();
             if (x == 0) {
                 pDialog = new ProgressDialog(getActivity());
@@ -435,20 +446,10 @@ public class DataChartActivity extends Fragment {
                 pDialog.dismiss();
 
             if (invalidUrl) {
-                if (CONNECTION_NUM.getAndIncrement() == 0) {
-                    new android.app.AlertDialog.Builder(getActivity())
-                            .setTitle("Error")
-                            .setMessage("Connection failed")
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    CONNECTION_NUM.decrementAndGet();
-                                }
-                            })
-                            .show();
-                }
+                ;
             } else {
-                addLineDataSet();
+                if (asyncTask1.getStatus() == Status.FINISHED)
+                    addLineDataSet();
             }
         }
 
@@ -456,15 +457,5 @@ public class DataChartActivity extends Fragment {
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
         }
-    }
-
-    private class TemperatureData {
-        String timestamp;
-        float data;
-    }
-
-    private class HumidityData {
-        String timestamp;
-        float data;
     }
 }

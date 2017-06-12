@@ -14,9 +14,12 @@ public class JsonObject {
 
     @SerializedName("deviceId")
     private String deviceID;
-
     @SerializedName("dataChannels")
     private List<DataChannels> dataChannels;
+
+    public String getDeviceID() {
+        return deviceID;
+    }
 
     public List<DataChannels> getDataChannels() {
         return dataChannels;

@@ -39,6 +39,9 @@ public class CourtActivity2 extends Fragment {
     private ImageView leftCourt, rightCourt;
     private View rootView;
 
+    private String IntentTemperature, IntentHumidity;
+    private boolean IntentLeftCourt, IntentRightCourt;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.court_view, container, false);
@@ -56,9 +59,25 @@ public class CourtActivity2 extends Fragment {
             }
         });
 
-        for (String anUrl : url) new LoadingMCSAsyncTask().execute(anUrl);
+        temperature.setText(IntentTemperature + " °C");
+        humidity.setText(IntentHumidity + " %");
+        if (IntentLeftCourt)
+            leftCourt.setImageResource(R.drawable.left_court);
+        else
+            leftCourt.setImageResource(R.drawable.left_court_dark);
+        if (IntentRightCourt)
+            rightCourt.setImageResource(R.drawable.right_court);
+        else
+            rightCourt.setImageResource(R.drawable.right_court_dark);
 
         return rootView;
+    }
+
+    public void Initialize(String intentTemperature, String intentHumidity, boolean leftCourt, boolean rightCourt) {
+        IntentTemperature = intentTemperature;
+        IntentHumidity = intentHumidity;
+        IntentLeftCourt = leftCourt;
+        IntentRightCourt = rightCourt;
     }
 
     private class LoadingMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
@@ -151,11 +170,11 @@ public class CourtActivity2 extends Fragment {
             switch (tJsonObject.getDataChannels().get(0).getDataChnID()) {
                 case "Temp_Display":
                     String temperature = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
-                    CourtActivity2.this.temperature.setText(temperature);
+                    CourtActivity2.this.temperature.setText(temperature + " °C");
                     break;
                 case "Hum_Display":
                     String humidity = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
-                    CourtActivity2.this.humidity.setText(humidity);
+                    CourtActivity2.this.humidity.setText(humidity + " %");
                     break;
                 case "Vib_Display":
                     if ((int) tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue() == 0)

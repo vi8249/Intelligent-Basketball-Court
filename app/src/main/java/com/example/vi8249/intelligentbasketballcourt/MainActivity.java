@@ -1,5 +1,6 @@
 package com.example.vi8249.intelligentbasketballcourt;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -20,10 +21,26 @@ public class MainActivity extends AppCompatActivity {
     private CourtActivity2 courtActivity2 = null;
     private DataChartActivity dataChartActivity = null;
 
+    private String court1Temperature, court1Humidity, court2Temperature, court2Humidity, court1Battery;
+    private boolean court1LeftCourt, court1RightCourt;
+    private ArrayList<TemperatureData> tDataList = null;
+    private ArrayList<HumidityData> hDataList = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent it = getIntent();
+        court1Temperature = it.getStringExtra("court1Temperature");
+        court1Humidity = it.getStringExtra("court1Humidity");
+        court1LeftCourt = it.getBooleanExtra("court1LeftCourt", true);
+        court1RightCourt = it.getBooleanExtra("court1RightCourt", true);
+        court2Temperature = it.getStringExtra("court2Temperature");
+        court2Humidity = it.getStringExtra("court2Humidity");
+        tDataList = it.getParcelableArrayListExtra("temperatureList");
+        hDataList = it.getParcelableArrayListExtra("humidityList");
+        court1Battery = it.getStringExtra("court1Battery");
 
         mViewPager = (CustomViewPager) findViewById(R.id.viewpager);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -53,15 +70,18 @@ public class MainActivity extends AppCompatActivity {
         CourtPagerAdapter adapter = new CourtPagerAdapter(getSupportFragmentManager());
         if (courtActivity1 == null) {
             courtActivity1 = new CourtActivity();
+            courtActivity1.Initialize(court1Temperature, court1Humidity, court1LeftCourt, court1RightCourt, court1Battery);
             adapter.addFragment(courtActivity1, "Court 1");
         }
         if (courtActivity2 == null) {
             courtActivity2 = new CourtActivity2();
+            courtActivity2.Initialize(court2Temperature, court2Humidity, true, false);
             adapter.addFragment(courtActivity2, "Court 2");
         }
         if (dataChartActivity == null) {
             dataChartActivity = new DataChartActivity();
-            adapter.addFragment(dataChartActivity, "Data Chart");
+            dataChartActivity.Initialize(tDataList, hDataList);
+            adapter.addFragment(dataChartActivity, "Line Chart");
         }
         viewPager.setAdapter(adapter);
     }

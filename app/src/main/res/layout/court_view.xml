@@ -86,19 +86,19 @@
         app:layout_constraintTop_toBottomOf="@+id/temperature" />
 
     <TextView
-        android:id="@+id/UV"
+        android:id="@+id/Battery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="55dp"
         android:layout_marginStart="55dp"
         android:layout_marginTop="13dp"
-        android:text="UV："
+        android:text="Battery Level："
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Humidity" />
 
     <TextView
-        android:id="@+id/uv"
+        android:id="@+id/battery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="9dp"
@@ -106,32 +106,8 @@
         android:layout_marginTop="12dp"
         android:text="N/A"
         android:textSize="18sp"
-        app:layout_constraintLeft_toRightOf="@+id/UV"
+        app:layout_constraintLeft_toRightOf="@+id/Battery"
         app:layout_constraintTop_toBottomOf="@+id/humidity" />
-
-    <TextView
-        android:id="@+id/PM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="55dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginTop="14dp"
-        android:text="PM2.5："
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/UV" />
-
-    <TextView
-        android:id="@+id/pm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="7dp"
-        android:layout_marginStart="7dp"
-        android:layout_marginTop="14dp"
-        android:text="N/A"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toRightOf="@+id/PM"
-        app:layout_constraintTop_toBottomOf="@+id/uv" />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refresh_layout"
