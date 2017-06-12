@@ -149,9 +149,9 @@
                 android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 android:text="Pull to Refresh"
+                android:textAlignment="center"
                 android:textSize="18sp" />
         </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>

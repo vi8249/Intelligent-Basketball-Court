@@ -29,8 +29,7 @@ public class CourtActivity2 extends Fragment {
     private static final AtomicInteger PROGRESS_NUM = new AtomicInteger(0);
     private static String[] url = {
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Temp_Display/datapoints",
-            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Hum_Display/datapoints",
-            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib_Display/datapoints",
+            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Hum_Display/datapoints"
     };
     HttpURLConnection connection = null;
     String responseString = "";
