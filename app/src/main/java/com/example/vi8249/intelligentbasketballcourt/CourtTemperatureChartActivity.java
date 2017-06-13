@@ -121,7 +121,7 @@ public class CourtTemperatureChartActivity extends Fragment {
 
         datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
         datePickerDialog.getDatePicker().setMinDate(1496332800000L);
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + 86400000);
         datePickerDialog.show();
     }
 
@@ -168,7 +168,7 @@ public class CourtTemperatureChartActivity extends Fragment {
 
         datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
         datePickerDialog.getDatePicker().setMinDate(1496332800000L);
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + 86400000);
         datePickerDialog.show();
     }
 
@@ -310,7 +310,7 @@ public class CourtTemperatureChartActivity extends Fragment {
         mChart.invalidate();
 
         mChart.setData(new LineData(dataSets));
-        mChart.setVisibleXRangeMaximum(15);
+        mChart.setVisibleXRangeMaximum(10);
     }
 
     private class LoadingTemperatureTask extends AsyncTask<String, Integer, Integer> {

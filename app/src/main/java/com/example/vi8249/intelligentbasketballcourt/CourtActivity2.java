@@ -1,6 +1,7 @@
 package com.example.vi8249.intelligentbasketballcourt;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -71,12 +72,23 @@ public class CourtActivity2 extends Fragment {
         else
             humidity.setText(IntentHumidity);
         if (!IntentBattery.equals("N/A")) {
-            if(IntentBattery.equals("33") || IntentBattery.equals("0"))
-                battery.setTextColor(Color.RED);
             battery.setText(IntentBattery + " %");
+            if(IntentBattery.equals("33") || IntentBattery.equals("0")) {
+                CourtActivity2.this.battery.setTextColor(Color.RED);
+                new android.app.AlertDialog.Builder(getActivity())
+                        .setTitle("低電量提示")
+                        .setMessage("板子要沒電了QQ\n快去換電池！ ( ･᷄ὢ･᷅ )")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
+            }
+            else{
+                CourtActivity2.this.battery.setTextColor(CourtActivity2.this.temperature.getTextColors());
+            }
         }
-        else
-            battery.setText(IntentBattery);
 
         if (IntentLeftCourt)
             leftCourt.setImageResource(R.drawable.left_court);
@@ -211,8 +223,21 @@ public class CourtActivity2 extends Fragment {
                 case "Bat_Display":
                     String battery = Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
                     CourtActivity2.this.battery.setText(battery + " %");
-                    if(battery.equals("33") || battery.equals("0"))
+                    if(battery.equals("33") || battery.equals("0")) {
                         CourtActivity2.this.battery.setTextColor(Color.RED);
+                        new android.app.AlertDialog.Builder(getActivity())
+                                .setTitle("低電量提示")
+                                .setMessage("板子要沒電了QQ\n快去換電池！ ( ･᷄ὢ･᷅ )")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .show();
+                    }
+                    else{
+                        CourtActivity2.this.battery.setTextColor(CourtActivity2.this.temperature.getTextColors());
+                    }
                     break;
             }
         }

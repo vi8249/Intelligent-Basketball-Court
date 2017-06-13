@@ -123,7 +123,7 @@ public class CourtAvailableChartActivity extends Fragment {
 
         datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
         datePickerDialog.getDatePicker().setMinDate(1496332800000L);
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + 86400000L );
         datePickerDialog.show();
     }
 
@@ -170,7 +170,7 @@ public class CourtAvailableChartActivity extends Fragment {
 
         datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
         datePickerDialog.getDatePicker().setMinDate(1496332800000L);
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + 86400000);
         datePickerDialog.show();
     }
 
@@ -312,7 +312,7 @@ public class CourtAvailableChartActivity extends Fragment {
         mChart.invalidate();
 
         mChart.setData(new LineData(dataSets));
-        mChart.setVisibleXRangeMaximum(15);
+        mChart.setVisibleXRangeMaximum(10);
     }
 
     private class LoadingLeftAsyncTask extends AsyncTask<String, Integer, Integer> {
