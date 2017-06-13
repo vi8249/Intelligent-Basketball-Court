@@ -1,6 +1,7 @@
 package com.example.vi8249.intelligentbasketballcourt;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -73,8 +74,11 @@ public class CourtActivity extends Fragment {
             humidity.setText(IntentHumidity + " %");
         else
             humidity.setText(IntentHumidity);
-        if (!IntentBattery.equals("N/A"))
+        if (!IntentBattery.equals("N/A")) {
+            if(IntentBattery.equals("33") || IntentBattery.equals("0"))
+                battery.setTextColor(Color.RED);
             battery.setText(IntentBattery + " %");
+        }
         else
             battery.setText(IntentBattery);
 
@@ -212,6 +216,8 @@ public class CourtActivity extends Fragment {
                 case "Bat_Display":
                     String battery = Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
                     CourtActivity.this.battery.setText(battery + " %");
+                    if(battery.equals("33") || battery.equals("0"))
+                        CourtActivity.this.battery.setTextColor(Color.RED);
                     break;
             }
         }
