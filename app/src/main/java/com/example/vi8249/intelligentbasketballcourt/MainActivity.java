@@ -20,10 +20,13 @@ public class MainActivity extends AppCompatActivity {
     private CustomViewPager mViewPager;
     private CourtActivity courtActivity1 = null;
     private CourtActivity2 courtActivity2 = null;
-    private DataChartActivity dataChartActivity = null;
+    private CourtAvailableChartActivity courtAvailableChartActivity = null;
+    private CourtTemperatureChartActivity temperatureChartActivity = null;
 
     private String court1Temperature, court1Humidity, court2Temperature, court2Humidity, court1Battery;
     private boolean court1LeftCourt, court1RightCourt;
+    private ArrayList<LeftCourtData> lDataList = null;
+    private ArrayList<RightCourtData> rDataList = null;
     private ArrayList<TemperatureData> tDataList = null;
     private ArrayList<HumidityData> hDataList = null;
 
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         court1RightCourt = it.getBooleanExtra("court1RightCourt", true);
         court2Temperature = it.getStringExtra("court2Temperature");
         court2Humidity = it.getStringExtra("court2Humidity");
+        lDataList = it.getParcelableArrayListExtra("leftCourtList");
+        rDataList = it.getParcelableArrayListExtra("rightCourtList");
         tDataList = it.getParcelableArrayListExtra("temperatureList");
         hDataList = it.getParcelableArrayListExtra("humidityList");
         court1Battery = it.getStringExtra("court1Battery");
@@ -79,10 +84,16 @@ public class MainActivity extends AppCompatActivity {
             courtActivity2.Initialize(court2Temperature, court2Humidity, true, false);
             adapter.addFragment(courtActivity2, "Court 2");
         }
-        if (dataChartActivity == null) {
-            dataChartActivity = new DataChartActivity();
-            dataChartActivity.Initialize(tDataList, hDataList);
-            adapter.addFragment(dataChartActivity, "Line Chart");
+        if (courtAvailableChartActivity == null) {
+            courtAvailableChartActivity = new CourtAvailableChartActivity();
+            courtAvailableChartActivity.Initialize(lDataList, rDataList);
+            adapter.addFragment(courtAvailableChartActivity, "Court Chart");
+        }
+        if (temperatureChartActivity == null) {
+            temperatureChartActivity = new CourtTemperatureChartActivity();
+            //Log.d("temp", tDataList.size() + " " + hDataList.size());
+            temperatureChartActivity.Initialize(tDataList, hDataList);
+            adapter.addFragment(temperatureChartActivity, "Weather Chart");
         }
         viewPager.setAdapter(adapter);
     }

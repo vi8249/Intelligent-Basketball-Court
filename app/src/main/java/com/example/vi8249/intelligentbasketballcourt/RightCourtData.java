@@ -7,26 +7,26 @@ import android.os.Parcelable;
  * Created by vi8249 on 2017/6/12.
  */
 
-public class HumidityData implements Parcelable {
-    public static final Parcelable.Creator<HumidityData> CREATOR = new Parcelable.Creator<HumidityData>() {
-        public HumidityData createFromParcel(Parcel in) {
-            return new HumidityData(in);
+public class RightCourtData implements Parcelable {
+    public static final Parcelable.Creator<RightCourtData> CREATOR = new Parcelable.Creator<RightCourtData>() {
+        public RightCourtData createFromParcel(Parcel in) {
+            return new RightCourtData(in);
         }
 
-        public HumidityData[] newArray(int size) {
-            return new HumidityData[size];
+        public RightCourtData[] newArray(int size) {
+            return new RightCourtData[size];
 
         }
     };
     String timestamp;
     float data;
 
-    protected HumidityData(Parcel in) {
+    protected RightCourtData(Parcel in) {
         timestamp = in.readString();
         data = in.readFloat();
     }
 
-    public HumidityData() {
+    public RightCourtData() {
 
     }
 

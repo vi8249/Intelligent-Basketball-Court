@@ -33,7 +33,10 @@ public class SplashScreenActivity extends Activity {
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Hum_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Bat_Display/datapoints"
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Bat_Display/datapoints",
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
+
     };
     protected Activity mSplash;
     HttpURLConnection connection = null;
@@ -41,6 +44,8 @@ public class SplashScreenActivity extends Activity {
     List<AsyncTask<String, Integer, Integer>> asyncTasks = new ArrayList<>();
     private String temperature = "N/A", humidity = "N/A", battery = "N/A";
     private boolean leftCourt = false, rightCourt = false;
+    private ArrayList<LeftCourtData> lDataList = new ArrayList<>();
+    private ArrayList<RightCourtData> rDataList = new ArrayList<>();
     private ArrayList<TemperatureData> tDataList = new ArrayList<>();
     private ArrayList<HumidityData> hDataList = new ArrayList<>();
     private Intent it;
@@ -59,9 +64,11 @@ public class SplashScreenActivity extends Activity {
         asyncTasks.add(new LoadingRightCourtAsyncTask().execute(url[3]));
         asyncTasks.add(new LoadingTemperatureAsyncTask().execute(url[4]));
         asyncTasks.add(new LoadingHumidityAsyncTask().execute(url[5]));
-        asyncTasks.add(new LoadingTemperatureChartAsyncTask().execute(url[6]));
-        asyncTasks.add(new LoadingHumidityChartMCSAsyncTask().execute(url[7]));
+        asyncTasks.add(new LoadingLeftCourtChartAsyncTask().execute(url[6]));
+        asyncTasks.add(new LoadingRightCourtChartMCSAsyncTask().execute(url[7]));
         asyncTasks.add(new LoadingBatteryAsyncTask().execute(url[8]));
+        asyncTasks.add(new LoadingTemperatureChartAsyncTask().execute(url[9]));
+        asyncTasks.add(new LoadingHumidityChartMCSAsyncTask().execute(url[10]));
     }
 
     private void chooseViewToUpdate(JsonObject tJsonObject) {
@@ -424,7 +431,7 @@ public class SplashScreenActivity extends Activity {
         }
     }
 
-    private class LoadingTemperatureChartAsyncTask extends AsyncTask<String, Integer, Integer> {
+    private class LoadingLeftCourtChartAsyncTask extends AsyncTask<String, Integer, Integer> {
         private boolean invalidUrl = false;
 
         @Override
@@ -445,10 +452,10 @@ public class SplashScreenActivity extends Activity {
                         String[] splitStr = tempStr.split(",");
 
                         if (splitStr[0].equals("Vib_Display")) {
-                            TemperatureData temperatureData = new TemperatureData();
-                            temperatureData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
-                            temperatureData.data = Float.valueOf(splitStr[2]);
-                            tDataList.add(temperatureData);
+                            LeftCourtData leftCourtData = new LeftCourtData();
+                            leftCourtData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
+                            leftCourtData.data = Float.valueOf(splitStr[2]);
+                            lDataList.add(leftCourtData);
                         }
                     }
                     bufferedReader.close();
@@ -474,7 +481,7 @@ public class SplashScreenActivity extends Activity {
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
             if (!invalidUrl) {
-                it.putExtra("temperatureList", tDataList);
+                it.putExtra("leftCourtList", lDataList);
             }
             boolean check = false;
             for (int i = 0; i < asyncTasks.size(); i++) {
@@ -494,7 +501,7 @@ public class SplashScreenActivity extends Activity {
         }
     }
 
-    private class LoadingHumidityChartMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
+    private class LoadingRightCourtChartMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
         private boolean invalidUrl = false;
 
         @Override
@@ -515,10 +522,10 @@ public class SplashScreenActivity extends Activity {
                         String[] splitStr = tempStr.split(",");
 
                         if (splitStr[0].equals("Vib2_Display")) {
-                            HumidityData humidityData = new HumidityData();
-                            humidityData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
-                            humidityData.data = Float.valueOf(splitStr[2]);
-                            hDataList.add(humidityData);
+                            RightCourtData rightCourtData = new RightCourtData();
+                            rightCourtData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
+                            rightCourtData.data = Float.valueOf(splitStr[2]);
+                            rDataList.add(rightCourtData);
                         }
                     }
                     bufferedReader.close();
@@ -544,7 +551,7 @@ public class SplashScreenActivity extends Activity {
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
             if (!invalidUrl) {
-                it.putExtra("humidityList", hDataList);
+                it.putExtra("rightCourtList", rDataList);
             }
             boolean check = false;
             for (int i = 0; i < asyncTasks.size(); i++) {
@@ -634,6 +641,146 @@ public class SplashScreenActivity extends Activity {
                     startActivity(it);
                     finish();
                 }
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+
+    private class LoadingTemperatureChartAsyncTask extends AsyncTask<String, Integer, Integer> {
+        private boolean invalidUrl = false;
+
+        @Override
+        protected Integer doInBackground(String... param) {
+            try {
+                URL url = new URL(param[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(2000);
+                connection.setReadTimeout(2000);
+
+                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = connection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+                    String tempStr;
+                    while ((tempStr = bufferedReader.readLine()) != null) {
+                        String[] splitStr = tempStr.split(",");
+
+                        if (splitStr[0].equals("Temp_Display")) {
+                            TemperatureData temperatureData = new TemperatureData();
+                            temperatureData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
+                            temperatureData.data = Float.valueOf(splitStr[2]);
+                            tDataList.add(temperatureData);
+                        }
+                    }
+                    bufferedReader.close();
+                    inputStream.close();
+                } else {
+                    invalidUrl = true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                //if(connection != null)
+                connection.disconnect();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            if (!invalidUrl) {
+                it.putExtra("temperatureList", tDataList);
+            }
+            boolean check = false;
+            for (int i = 0; i < asyncTasks.size(); i++) {
+                AsyncTask<String, Integer, Integer> asyncTaskItem = asyncTasks.get(i);
+                if (i != 9)
+                    check = asyncTaskItem.getStatus() == Status.FINISHED;
+            }
+            if (check) {
+                startActivity(it);
+                finish();
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+
+    private class LoadingHumidityChartMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
+        private boolean invalidUrl = false;
+
+        @Override
+        protected Integer doInBackground(String... param) {
+            try {
+                URL url = new URL(param[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(2000);
+                connection.setReadTimeout(2000);
+
+                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = connection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+                    String tempStr;
+                    while ((tempStr = bufferedReader.readLine()) != null) {
+                        String[] splitStr = tempStr.split(",");
+
+                        if (splitStr[0].equals("Hum_Display")) {
+                            HumidityData humidityData = new HumidityData();
+                            humidityData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
+                            humidityData.data = Float.valueOf(splitStr[2]);
+                            hDataList.add(humidityData);
+                        }
+                    }
+                    bufferedReader.close();
+                    inputStream.close();
+                } else {
+                    invalidUrl = true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                //if(connection != null)
+                connection.disconnect();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            if (!invalidUrl) {
+                it.putExtra("humidityList", hDataList);
+            }
+            boolean check = false;
+            for (int i = 0; i < asyncTasks.size(); i++) {
+                AsyncTask<String, Integer, Integer> asyncTaskItem = asyncTasks.get(i);
+                if (i != 10)
+                    check = asyncTaskItem.getStatus() == Status.FINISHED;
+            }
+            if (check) {
+                startActivity(it);
+                finish();
             }
         }
 

@@ -7,26 +7,26 @@ import android.os.Parcelable;
  * Created by vi8249 on 2017/6/12.
  */
 
-public class TemperatureData implements Parcelable {
-    public static final Parcelable.Creator<TemperatureData> CREATOR = new Parcelable.Creator<TemperatureData>() {
-        public TemperatureData createFromParcel(Parcel in) {
-            return new TemperatureData(in);
+public class LeftCourtData implements Parcelable {
+    public static final Parcelable.Creator<LeftCourtData> CREATOR = new Parcelable.Creator<LeftCourtData>() {
+        public LeftCourtData createFromParcel(Parcel in) {
+            return new LeftCourtData(in);
         }
 
-        public TemperatureData[] newArray(int size) {
-            return new TemperatureData[size];
+        public LeftCourtData[] newArray(int size) {
+            return new LeftCourtData[size];
 
         }
     };
     String timestamp;
     float data;
 
-    protected TemperatureData(Parcel in) {
+    protected LeftCourtData(Parcel in) {
         timestamp = in.readString();
         data = in.readFloat();
     }
 
-    public TemperatureData() {
+    public LeftCourtData() {
 
     }
 

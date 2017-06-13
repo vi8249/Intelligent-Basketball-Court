@@ -1,7 +1,6 @@
 package com.example.vi8249.intelligentbasketballcourt;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -24,13 +23,10 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
-import org.w3c.dom.Text;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
@@ -45,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by vi8249 on 2017/6/3.
  */
 
-public class DataChartActivity extends Fragment {
+public class CourtAvailableChartActivity extends Fragment {
     private static final AtomicInteger PROGRESS_NUM = new AtomicInteger(0);
     private static final AtomicInteger CONNECTION_NUM = new AtomicInteger(0);
     HttpURLConnection connection = null;
@@ -60,8 +56,8 @@ public class DataChartActivity extends Fragment {
     private String startTime, endTime;
     private Date date1, date2;
     private LineChart mChart;
-    private ArrayList<TemperatureData> tDataList = null;
-    private ArrayList<HumidityData> hDataList = null;
+    private ArrayList<LeftCourtData> lDataList = null;
+    private ArrayList<RightCourtData> rDataList = null;
     private ArrayList<ILineDataSet> dataSets = new ArrayList<>();
     private int mYear, mMonth, mDay;
     private AsyncTask<String, Integer, Integer> asyncTask1, asyncTask2;
@@ -72,11 +68,6 @@ public class DataChartActivity extends Fragment {
 
         @Override
         public void onClick(View v) {
-            final Calendar c = Calendar.getInstance();
-            mYear = c.get(Calendar.YEAR);
-            mMonth = c.get(Calendar.MONTH);
-            mDay = c.get(Calendar.DAY_OF_MONTH);
-
             showStartDatePicker();
         }
     };
@@ -85,11 +76,6 @@ public class DataChartActivity extends Fragment {
 
         @Override
         public void onClick(View v) {
-            final Calendar c = Calendar.getInstance();
-            mYear = c.get(Calendar.YEAR);
-            mMonth = c.get(Calendar.MONTH);
-            mDay = c.get(Calendar.DAY_OF_MONTH);
-
             showEndDatePicker();
         }
     };
@@ -105,7 +91,7 @@ public class DataChartActivity extends Fragment {
                 try {
                     date1 = formatter.parse(format);
                     startTime = "" + date1.getTime();
-                    Log.d("timestamp", "" + date1.getTime());
+                    //Log.d("timestamp", "" + date1.getTime());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -123,8 +109,8 @@ public class DataChartActivity extends Fragment {
                                 .show();
                     } else {
                         setUrl();
-                        asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
-                        asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
+                        asyncTask1 = new LoadingLeftAsyncTask().execute(url[0]);
+                        asyncTask2 = new LoadingRightMCSAsyncTask().execute(url[1]);
                     }
                 }
             }
@@ -151,7 +137,7 @@ public class DataChartActivity extends Fragment {
                 try {
                     date2 = formatter.parse(format);
                     endTime = "" + date2.getTime();
-                    Log.d("timestamp", "" + date2.getTime());
+                    //Log.d("timestamp", "" + date2.getTime());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -169,8 +155,8 @@ public class DataChartActivity extends Fragment {
                                 .show();
                     } else {
                         setUrl();
-                        asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
-                        asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
+                        asyncTask1 = new LoadingLeftAsyncTask().execute(url[0]);
+                        asyncTask2 = new LoadingRightMCSAsyncTask().execute(url[1]);
                     }
                 }
             }
@@ -199,19 +185,19 @@ public class DataChartActivity extends Fragment {
 
         InitialLineChart();
 
-        if (tDataList != null && hDataList != null)
+        if (lDataList != null && rDataList != null)
             addLineDataSet();
         else {
-            tDataList = new ArrayList<>();
-            hDataList = new ArrayList<>();
+            lDataList = new ArrayList<>();
+            rDataList = new ArrayList<>();
         }
 
         return rootView;
     }
 
-    public void Initialize(ArrayList<TemperatureData> tList, ArrayList<HumidityData> hList) {
-        tDataList = tList;
-        hDataList = hList;
+    public void Initialize(ArrayList<LeftCourtData> lList, ArrayList<RightCourtData> rList) {
+        lDataList = lList;
+        rDataList = rList;
     }
 
     private void InitialLineChart() {
@@ -238,7 +224,7 @@ public class DataChartActivity extends Fragment {
     }
 
     private void addLineDataSet() {
-        Log.d("temp", tDataList.size() + " " + hDataList.size());
+        //Log.d("temp", lDataList.size() + " " + rDataList.size());
         mChart.clear();
         dataSets.clear();
 
@@ -248,14 +234,14 @@ public class DataChartActivity extends Fragment {
         ArrayList<Entry> yAxes2 = new ArrayList<>();
 
         int count = 0;
-        for (TemperatureData data : tDataList) {
+        for (LeftCourtData data : lDataList) {
             yAxes.add(new Entry(count, data.data));
             xAxes.add(count, data.timestamp);
             count++;
         }
 
         count = 0;
-        for (HumidityData data : hDataList) {
+        for (RightCourtData data : rDataList) {
             yAxes2.add(new Entry(count, data.data));
             xAxes2.add(count, data.timestamp);
             count++;
@@ -327,7 +313,7 @@ public class DataChartActivity extends Fragment {
         mChart.setVisibleXRangeMaximum(15);
     }
 
-    private class LoadingTemperatureAsyncTask extends AsyncTask<String, Integer, Integer> {
+    private class LoadingLeftAsyncTask extends AsyncTask<String, Integer, Integer> {
         private boolean invalidUrl = false;
 
         @Override
@@ -348,10 +334,10 @@ public class DataChartActivity extends Fragment {
                         String[] splitStr = tempStr.split(",");
 
                         if (splitStr[0].equals("Vib_Display")) {
-                            TemperatureData temperatureData = new TemperatureData();
-                            temperatureData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
-                            temperatureData.data = Float.valueOf(splitStr[2]);
-                            tDataList.add(temperatureData);
+                            LeftCourtData leftCourtData = new LeftCourtData();
+                            leftCourtData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
+                            leftCourtData.data = Float.valueOf(splitStr[2]);
+                            lDataList.add(leftCourtData);
                         }
                     }
                     bufferedReader.close();
@@ -371,13 +357,13 @@ public class DataChartActivity extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            tDataList.clear();
+            lDataList.clear();
             int x = PROGRESS_NUM.getAndIncrement();
             if (x == 0) {
                 pDialog = new ProgressDialog(getActivity());
                 pDialog = ProgressDialog.show(getActivity(), "Message", "Loading...", true);
                 pDialog.setCancelable(false);
-                tDataList.clear();
+                lDataList.clear();
             }
             pDialog.show();
         }
@@ -416,7 +402,7 @@ public class DataChartActivity extends Fragment {
         }
     }
 
-    private class LoadingHumidityMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
+    private class LoadingRightMCSAsyncTask extends AsyncTask<String, Integer, Integer> {
         private boolean invalidUrl = false;
 
         @Override
@@ -437,10 +423,10 @@ public class DataChartActivity extends Fragment {
                         String[] splitStr = tempStr.split(",");
 
                         if (splitStr[0].equals("Vib2_Display")) {
-                            HumidityData humidityData = new HumidityData();
-                            humidityData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
-                            humidityData.data = Float.valueOf(splitStr[2]);
-                            hDataList.add(humidityData);
+                            RightCourtData rightCourtData = new RightCourtData();
+                            rightCourtData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
+                            rightCourtData.data = Float.valueOf(splitStr[2]);
+                            rDataList.add(rightCourtData);
                         }
                     }
                     bufferedReader.close();
@@ -460,13 +446,13 @@ public class DataChartActivity extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            hDataList.clear();
+            rDataList.clear();
             int x = PROGRESS_NUM.getAndIncrement();
             if (x == 0) {
                 pDialog = new ProgressDialog(getActivity());
                 pDialog = ProgressDialog.show(getActivity(), "Message", "Loading...", true);
                 pDialog.setCancelable(false);
-                hDataList.clear();
+                rDataList.clear();
             }
             pDialog.show();
         }
