@@ -36,7 +36,7 @@ public class SplashScreenActivity extends Activity {
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Bat_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
-
+            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Bat_Display/datapoints"
     };
     protected Activity mSplash;
     HttpURLConnection connection = null;
@@ -69,6 +69,7 @@ public class SplashScreenActivity extends Activity {
         asyncTasks.add(new LoadingBatteryAsyncTask().execute(url[8]));
         asyncTasks.add(new LoadingTemperatureChartAsyncTask().execute(url[9]));
         asyncTasks.add(new LoadingHumidityChartMCSAsyncTask().execute(url[10]));
+        asyncTasks.add(new LoadingBatteryAsyncTask().execute(url[11]));
     }
 
     private void chooseViewToUpdate(JsonObject tJsonObject) {
@@ -635,6 +636,19 @@ public class SplashScreenActivity extends Activity {
                 for (int i = 0; i < asyncTasks.size(); i++) {
                     AsyncTask<String, Integer, Integer> asyncTaskItem = asyncTasks.get(i);
                     if (i != 8)
+                        check = asyncTaskItem.getStatus() == Status.FINISHED;
+                }
+                if (check) {
+                    startActivity(it);
+                    finish();
+                }
+            }
+            else if (deviceId.equals("DIK4dY0L")) {
+                it.putExtra("court2Battery", battery);
+                boolean check = false;
+                for (int i = 0; i < asyncTasks.size(); i++) {
+                    AsyncTask<String, Integer, Integer> asyncTaskItem = asyncTasks.get(i);
+                    if (i != 11)
                         check = asyncTaskItem.getStatus() == Status.FINISHED;
                 }
                 if (check) {

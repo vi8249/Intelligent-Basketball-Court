@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private CourtAvailableChartActivity courtAvailableChartActivity = null;
     private CourtTemperatureChartActivity temperatureChartActivity = null;
 
-    private String court1Temperature, court1Humidity, court2Temperature, court2Humidity, court1Battery;
+    private String court1Temperature, court1Humidity, court2Temperature, court2Humidity, court1Battery, court2Battery;
     private boolean court1LeftCourt, court1RightCourt;
     private ArrayList<LeftCourtData> lDataList = null;
     private ArrayList<RightCourtData> rDataList = null;
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         tDataList = it.getParcelableArrayListExtra("temperatureList");
         hDataList = it.getParcelableArrayListExtra("humidityList");
         court1Battery = it.getStringExtra("court1Battery");
+        court2Battery = it.getStringExtra("court2Battery");
 
         mViewPager = (CustomViewPager) findViewById(R.id.viewpager);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (courtActivity2 == null) {
             courtActivity2 = new CourtActivity2();
-            courtActivity2.Initialize(court2Temperature, court2Humidity, true, false);
+            courtActivity2.Initialize(court2Temperature, court2Humidity, true, false, court2Battery);
             adapter.addFragment(courtActivity2, "Court 2");
         }
         if (courtAvailableChartActivity == null) {
