@@ -1,6 +1,7 @@
 package com.example.vi8249.intelligentbasketballcourt;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -29,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
@@ -52,7 +54,7 @@ public class DataChartActivity extends Fragment {
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints.csv?start=1496246400000&end=" + System.currentTimeMillis() + "&limit=500"
     };
     private ProgressDialog pDialog;
-    private TextView textView, textView2, noDataText;
+    private TextView textView, textView2;
     private Button mBtn, mBtn2;
     private View rootView;
     private String startTime, endTime;
@@ -63,57 +65,19 @@ public class DataChartActivity extends Fragment {
     private ArrayList<ILineDataSet> dataSets = new ArrayList<>();
     private int mYear, mMonth, mDay;
     private AsyncTask<String, Integer, Integer> asyncTask1, asyncTask2;
+    private DatePickerDialog datePickerDialog = null;
+    private DatePickerDialog.OnDateSetListener dateSetListener = null;
 
     private View.OnClickListener mBtnOnClick = new View.OnClickListener() {
 
         @Override
         public void onClick(View v) {
-            noDataText.setVisibility(View.INVISIBLE);
             final Calendar c = Calendar.getInstance();
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
             mDay = c.get(Calendar.DAY_OF_MONTH);
 
-            new DatePickerDialog(rootView.getContext(), new DatePickerDialog.OnDateSetListener() {
-
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int day) {
-                    String format = setDateFormat(year, month, day);
-                    textView.setText(format);
-
-                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                    try {
-                        date1 = formatter.parse(format);
-                        startTime = "" + date1.getTime();
-                        Log.d("timestamp", "" + date1.getTime());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (!textView2.getText().equals("End Time")) {
-                        if (date1.getTime() >= date2.getTime()) {
-                            new android.app.AlertDialog.Builder(getActivity())
-                                    .setTitle("Warning")
-                                    .setMessage("InValid Input!\n End Time must bigger than Start Time")
-                                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    })
-                                    .show();
-                        } else {
-                            setUrl();
-                            mChart.getLineData().clearValues();
-                            //mChart.clearValues();
-                            if (!dataSets.isEmpty())
-                                dataSets.clear();
-                            asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
-                            asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
-                        }
-                    }
-                }
-
-            }, mYear, mMonth, mDay).show();
+            showStartDatePicker();
         }
     };
 
@@ -121,51 +85,106 @@ public class DataChartActivity extends Fragment {
 
         @Override
         public void onClick(View v) {
-            noDataText.setVisibility(View.INVISIBLE);
             final Calendar c = Calendar.getInstance();
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
             mDay = c.get(Calendar.DAY_OF_MONTH);
-            new DatePickerDialog(rootView.getContext(), new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int day) {
-                    String format = setDateFormat(year, month, day);
-                    textView2.setText(format);
 
-                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                    try {
-                        date2 = formatter.parse(format);
-                        endTime = "" + date2.getTime();
-                        Log.d("timestamp", "" + date2.getTime());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (!textView.getText().equals("Start Time")) {
-                        if (date1.getTime() >= date2.getTime()) {
-                            new android.app.AlertDialog.Builder(getActivity())
-                                    .setTitle("Warning")
-                                    .setMessage("InValid Input!\n End Time must bigger than Start Time")
-                                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    })
-                                    .show();
-                        } else {
-                            setUrl();
-                            mChart.getLineData().clearValues();
-                            //mChart.clearValues();
-                            if(!dataSets.isEmpty())
-                                dataSets.clear();
-                            asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
-                            asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
-                        }
-                    }
-                }
-            }, mYear, mMonth, mDay).show();
+            showEndDatePicker();
         }
     };
+
+    private void showStartDatePicker() {
+        dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                String format = setDateFormat(year, month, dayOfMonth);
+                textView.setText(format);
+
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                try {
+                    date1 = formatter.parse(format);
+                    startTime = "" + date1.getTime();
+                    Log.d("timestamp", "" + date1.getTime());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (!textView2.getText().equals("End Time")) {
+                    if (date1.getTime() >= date2.getTime()) {
+                        new android.app.AlertDialog.Builder(getActivity())
+                                .setTitle("Warning")
+                                .setMessage("InValid Input!\n End Time must bigger than Start Time")
+                                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .show();
+                    } else {
+                        setUrl();
+                        asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
+                        asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
+                    }
+                }
+            }
+        };
+
+        final Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.show();
+    }
+
+    private void showEndDatePicker() {
+        dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                String format = setDateFormat(year, month, dayOfMonth);
+                textView2.setText(format);
+
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                try {
+                    date2 = formatter.parse(format);
+                    endTime = "" + date2.getTime();
+                    Log.d("timestamp", "" + date2.getTime());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (!textView.getText().equals("Start Time")) {
+                    if (date1.getTime() >= date2.getTime()) {
+                        new android.app.AlertDialog.Builder(getActivity())
+                                .setTitle("Warning")
+                                .setMessage("InValid Input!\n End Time must bigger than Start Time")
+                                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .show();
+                    } else {
+                        setUrl();
+                        asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
+                        asyncTask2 = new LoadingHumidityMCSAsyncTask().execute(url[1]);
+                    }
+                }
+            }
+        };
+
+        final Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.show();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -173,8 +192,6 @@ public class DataChartActivity extends Fragment {
 
         textView = (TextView) rootView.findViewById(R.id.textView);
         textView2 = (TextView) rootView.findViewById(R.id.textView2);
-        noDataText = (TextView) rootView.findViewById(R.id.noDataText);
-        noDataText.setVisibility(View.INVISIBLE);
         mBtn = (Button) rootView.findViewById(R.id.button);
         mBtn.setOnClickListener(mBtnOnClick);
         mBtn2 = (Button) rootView.findViewById(R.id.button2);
@@ -222,6 +239,9 @@ public class DataChartActivity extends Fragment {
 
     private void addLineDataSet() {
         Log.d("temp", tDataList.size() + " " + hDataList.size());
+        mChart.clear();
+        dataSets.clear();
+
         ArrayList<String> xAxes = new ArrayList<>();
         ArrayList<Entry> yAxes = new ArrayList<>();
         ArrayList<String> xAxes2 = new ArrayList<>();
@@ -270,7 +290,7 @@ public class DataChartActivity extends Fragment {
 
         // YAxis
         YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.setAxisMaximum(1f);
+        leftAxis.setAxisMaximum(1.5f);
         leftAxis.setDrawGridLines(false);
 
         // XAxis
@@ -304,7 +324,7 @@ public class DataChartActivity extends Fragment {
         mChart.invalidate();
 
         mChart.setData(new LineData(dataSets));
-        mChart.setVisibleXRangeMaximum(10);
+        mChart.setVisibleXRangeMaximum(15);
     }
 
     private class LoadingTemperatureAsyncTask extends AsyncTask<String, Integer, Integer> {
@@ -381,8 +401,9 @@ public class DataChartActivity extends Fragment {
                             }
                         })
                         .show();
-                noDataText.setVisibility(View.VISIBLE);
-                mChart.clearValues();
+                //mChart.getLineData().clearValues();
+                mChart.clear();
+                dataSets.clear();
             } else {
                 if (asyncTask2.getStatus() == Status.FINISHED)
                     addLineDataSet();
