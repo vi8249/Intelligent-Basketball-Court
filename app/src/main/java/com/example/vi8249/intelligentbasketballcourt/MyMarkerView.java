@@ -46,10 +46,10 @@ public class MyMarkerView extends MarkerView {
 
         tvDate.setText("" + XAxisLabel.get((int) e.getX()));
 
-        if (highlight.getDataSetIndex() == 1)
-            tvContent.setText("" + e.getY() + " %");
+        if(e.getY() == 1f)
+            tvContent.setText("Available");
         else
-            tvContent.setText("" + e.getY() + " °C");
+            tvContent.setText("Unavailable");
 
         super.refreshContent(e, highlight);
     }
