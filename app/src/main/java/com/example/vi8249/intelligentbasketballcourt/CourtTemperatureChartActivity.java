@@ -281,13 +281,13 @@ public class CourtTemperatureChartActivity extends Fragment {
 
         // XAxis
         CustomXAxisValue customXAxisValue;
-        MyMarkerView markerView;
+        MyMarkerView2 markerView;
         if (xAxes.size() > xAxes2.size()) {
             customXAxisValue = new CustomXAxisValue(xAxes);
-            markerView = new MyMarkerView(rootView.getContext(), R.layout.marker_view, xAxes);
+            markerView = new MyMarkerView2(rootView.getContext(), R.layout.marker_view, xAxes);
         } else {
             customXAxisValue = new CustomXAxisValue(xAxes2);
-            markerView = new MyMarkerView(rootView.getContext(), R.layout.marker_view, xAxes2);
+            markerView = new MyMarkerView2(rootView.getContext(), R.layout.marker_view, xAxes2);
         }
 
         mChart.getXAxis().setValueFormatter(customXAxisValue);
