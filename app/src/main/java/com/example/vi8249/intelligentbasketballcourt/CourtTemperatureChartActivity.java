@@ -94,11 +94,11 @@ public class CourtTemperatureChartActivity extends Fragment {
                     e.printStackTrace();
                 }
 
-                if (!textView2.getText().equals("End Time")) {
+                if (!textView2.getText().equals("End Date")) {
                     if (date1.getTime() >= date2.getTime()) {
                         new android.app.AlertDialog.Builder(getActivity())
                                 .setTitle("Warning")
-                                .setMessage("InValid Input!\n End Time must bigger than Start Time")
+                                .setMessage("InValid Input!\nEnd Date must bigger than Start Date")
                                 .setNeutralButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -120,6 +120,7 @@ public class CourtTemperatureChartActivity extends Fragment {
         mDay = c.get(Calendar.DAY_OF_MONTH);
 
         datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMinDate(1496332800000L);
         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
     }
@@ -140,11 +141,11 @@ public class CourtTemperatureChartActivity extends Fragment {
                     e.printStackTrace();
                 }
 
-                if (!textView.getText().equals("Start Time")) {
+                if (!textView.getText().equals("Start Date")) {
                     if (date1.getTime() >= date2.getTime()) {
                         new android.app.AlertDialog.Builder(getActivity())
                                 .setTitle("Warning")
-                                .setMessage("InValid Input!\n End Time must bigger than Start Time")
+                                .setMessage("InValid Input!\nEnd Date must bigger than Start Date")
                                 .setNeutralButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -166,6 +167,7 @@ public class CourtTemperatureChartActivity extends Fragment {
         mDay = c.get(Calendar.DAY_OF_MONTH);
 
         datePickerDialog = new DatePickerDialog(rootView.getContext(), dateSetListener, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMinDate(1496332800000L);
         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
     }
