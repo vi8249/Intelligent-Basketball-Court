@@ -86,7 +86,7 @@ public class SplashScreenActivity extends Activity {
                 rightCourt = (int) tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue() == 0;
                 break;
             case "Bat_Display":
-                battery = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
+                battery = Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
                 break;
         }
     }

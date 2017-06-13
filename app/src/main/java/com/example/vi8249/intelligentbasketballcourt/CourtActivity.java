@@ -210,7 +210,7 @@ public class CourtActivity extends Fragment {
                     //Log.d("json", Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue()));
                     break;
                 case "Bat_Display":
-                    String battery = Float.toString(tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
+                    String battery = Integer.toString((int)tJsonObject.getDataChannels().get(0).getDataPoints().get(0).getValues().getValue());
                     CourtActivity.this.battery.setText(battery + " %");
                     break;
             }
