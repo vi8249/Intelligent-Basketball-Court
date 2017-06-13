@@ -23,6 +23,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,11 +48,11 @@ public class DataChartActivity extends Fragment {
     private static final AtomicInteger CONNECTION_NUM = new AtomicInteger(0);
     HttpURLConnection connection = null;
     private String[] url = {
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=1496246400000&end=" + System.currentTimeMillis() + "&limit=500",
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=1496246400000&end=" + System.currentTimeMillis() + "&limit=500"
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib_Display/datapoints.csv?start=1496246400000&end=" + System.currentTimeMillis() + "&limit=500",
+            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints.csv?start=1496246400000&end=" + System.currentTimeMillis() + "&limit=500"
     };
     private ProgressDialog pDialog;
-    private TextView textView, textView2;
+    private TextView textView, textView2, noDataText;
     private Button mBtn, mBtn2;
     private View rootView;
     private String startTime, endTime;
@@ -66,6 +68,7 @@ public class DataChartActivity extends Fragment {
 
         @Override
         public void onClick(View v) {
+            noDataText.setVisibility(View.INVISIBLE);
             final Calendar c = Calendar.getInstance();
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
@@ -100,7 +103,8 @@ public class DataChartActivity extends Fragment {
                                     .show();
                         } else {
                             setUrl();
-                            mChart.clearValues();
+                            mChart.getLineData().clearValues();
+                            //mChart.clearValues();
                             if (!dataSets.isEmpty())
                                 dataSets.clear();
                             asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
@@ -117,6 +121,7 @@ public class DataChartActivity extends Fragment {
 
         @Override
         public void onClick(View v) {
+            noDataText.setVisibility(View.INVISIBLE);
             final Calendar c = Calendar.getInstance();
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
@@ -149,7 +154,8 @@ public class DataChartActivity extends Fragment {
                                     .show();
                         } else {
                             setUrl();
-                            mChart.clearValues();
+                            mChart.getLineData().clearValues();
+                            //mChart.clearValues();
                             if(!dataSets.isEmpty())
                                 dataSets.clear();
                             asyncTask1 = new LoadingTemperatureAsyncTask().execute(url[0]);
@@ -167,6 +173,8 @@ public class DataChartActivity extends Fragment {
 
         textView = (TextView) rootView.findViewById(R.id.textView);
         textView2 = (TextView) rootView.findViewById(R.id.textView2);
+        noDataText = (TextView) rootView.findViewById(R.id.noDataText);
+        noDataText.setVisibility(View.INVISIBLE);
         mBtn = (Button) rootView.findViewById(R.id.button);
         mBtn.setOnClickListener(mBtnOnClick);
         mBtn2 = (Button) rootView.findViewById(R.id.button2);
@@ -201,8 +209,8 @@ public class DataChartActivity extends Fragment {
 
     private void setUrl() {
         String tUrls[] = {
-                "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=:startTime&end=:endTime&limit=500",
-                "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=:startTime&end=:endTime&limit=500",
+                "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib_Display/datapoints.csv?start=:startTime&end=:endTime&limit=500",
+                "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints.csv?start=:startTime&end=:endTime&limit=500",
         };
         for (int i = 0; i < tUrls.length; i++) {
             String s = tUrls[i].replace(":startTime", startTime);
@@ -213,6 +221,7 @@ public class DataChartActivity extends Fragment {
     }
 
     private void addLineDataSet() {
+        Log.d("temp", tDataList.size() + " " + hDataList.size());
         ArrayList<String> xAxes = new ArrayList<>();
         ArrayList<Entry> yAxes = new ArrayList<>();
         ArrayList<String> xAxes2 = new ArrayList<>();
@@ -232,7 +241,7 @@ public class DataChartActivity extends Fragment {
             count++;
         }
 
-        LineDataSet lineDataSet = new LineDataSet(yAxes, "Temperature");
+        LineDataSet lineDataSet = new LineDataSet(yAxes, "Court1 left");
         lineDataSet.setDrawCircles(true);
         lineDataSet.setCircleColor(Color.BLUE);
         lineDataSet.setCircleRadius(7f);
@@ -244,7 +253,7 @@ public class DataChartActivity extends Fragment {
         lineDataSet.setDrawHorizontalHighlightIndicator(false);
         lineDataSet.setDrawVerticalHighlightIndicator(false);
 
-        LineDataSet lineDataSet2 = new LineDataSet(yAxes2, "Humidity");
+        LineDataSet lineDataSet2 = new LineDataSet(yAxes2, "Court1 right");
         lineDataSet2.setDrawCircles(true);
         lineDataSet2.setCircleColor(Color.RED);
         lineDataSet2.setCircleRadius(7f);
@@ -261,7 +270,7 @@ public class DataChartActivity extends Fragment {
 
         // YAxis
         YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.setAxisMaximum(100f);
+        leftAxis.setAxisMaximum(1f);
         leftAxis.setDrawGridLines(false);
 
         // XAxis
@@ -284,6 +293,8 @@ public class DataChartActivity extends Fragment {
         mChart.setDrawGridBackground(false);
         mChart.setTouchEnabled(true);
         mChart.setPinchZoom(true);
+        mChart.setScaleEnabled(false);
+        mChart.fitScreen();
 
         Description des = new Description();
         des.setText("");
@@ -316,7 +327,7 @@ public class DataChartActivity extends Fragment {
                     while ((tempStr = bufferedReader.readLine()) != null) {
                         String[] splitStr = tempStr.split(",");
 
-                        if (splitStr[0].equals("Temp_Display")) {
+                        if (splitStr[0].equals("Vib_Display")) {
                             TemperatureData temperatureData = new TemperatureData();
                             temperatureData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
                             temperatureData.data = Float.valueOf(splitStr[2]);
@@ -370,6 +381,8 @@ public class DataChartActivity extends Fragment {
                             }
                         })
                         .show();
+                noDataText.setVisibility(View.VISIBLE);
+                mChart.clearValues();
             } else {
                 if (asyncTask2.getStatus() == Status.FINISHED)
                     addLineDataSet();
@@ -402,7 +415,7 @@ public class DataChartActivity extends Fragment {
                     while ((tempStr = bufferedReader.readLine()) != null) {
                         String[] splitStr = tempStr.split(",");
 
-                        if (splitStr[0].equals("Hum_Display")) {
+                        if (splitStr[0].equals("Vib2_Display")) {
                             HumidityData humidityData = new HumidityData();
                             humidityData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
                             humidityData.data = Float.valueOf(splitStr[2]);

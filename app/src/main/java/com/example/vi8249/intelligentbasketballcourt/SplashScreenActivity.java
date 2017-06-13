@@ -31,8 +31,8 @@ public class SplashScreenActivity extends Activity {
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Temp_Display/datapoints",
             "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Hum_Display/datapoints",
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Temp_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
-            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Hum_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
+            "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Vib_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
+            "https://api.mediatek.com/mcs/v2/devices/DIK4dY0L/datachannels/Vib2_Display/datapoints.csv?start=1496409690000&end=" + System.currentTimeMillis() + "&limit=100",
             "https://api.mediatek.com/mcs/v2/devices/DKV8iNT6/datachannels/Bat_Display/datapoints"
     };
     protected Activity mSplash;
@@ -444,7 +444,7 @@ public class SplashScreenActivity extends Activity {
                     while ((tempStr = bufferedReader.readLine()) != null) {
                         String[] splitStr = tempStr.split(",");
 
-                        if (splitStr[0].equals("Temp_Display")) {
+                        if (splitStr[0].equals("Vib_Display")) {
                             TemperatureData temperatureData = new TemperatureData();
                             temperatureData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
                             temperatureData.data = Float.valueOf(splitStr[2]);
@@ -514,7 +514,7 @@ public class SplashScreenActivity extends Activity {
                     while ((tempStr = bufferedReader.readLine()) != null) {
                         String[] splitStr = tempStr.split(",");
 
-                        if (splitStr[0].equals("Hum_Display")) {
+                        if (splitStr[0].equals("Vib2_Display")) {
                             HumidityData humidityData = new HumidityData();
                             humidityData.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(Long.valueOf(splitStr[1])));
                             humidityData.data = Float.valueOf(splitStr[2]);
